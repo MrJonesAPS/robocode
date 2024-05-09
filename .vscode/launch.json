@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+        "preLaunchTask": "compile robots",
+        "type": "java",
+        "name": "Robocode",
+        "request": "launch",
+        "mainClass": "robocode.Robocode",
+        "vmArgs": ["-Xmx512M"
+        , "-Djava.security.manager=allow"
+        , "-Xdock:name=Robocode"
+        , "-Xdock:icon=robocode.ico"
+        , "-XX:+IgnoreUnrecognizedVMOptions"
+        , "-Dsun.io.useCanonCaches=false"
+        , "-Ddebug=true"
+        , "--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"
+        , "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+        , "--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED" 
+        , "--add-opens=java.desktop/sun.awt=ALL-UNNAMED" ]
+        ,
+        "env": {
+        "JAVA_HOME": "/usr/libexec/java_home",
+        "PATH": "${PATH}:${JAVA_HOME}/bin"
+        },
+        }
+        ]
+}
