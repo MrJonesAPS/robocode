@@ -2,3 +2,4 @@ config/robocode.properties
 config/window.properties
 robots/robot.database
 .DS_Store
+*.class

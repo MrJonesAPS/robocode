@@ -7,6 +7,12 @@ import robocode.ScannedRobotEvent;
 
 
 public class ChrisJones extends Robot {
+
+    //constants for tuning
+    int maxShootingDistance = 600;
+    int minRange = 100;
+
+    //variables to keep track of opponent
     boolean foundOpp = false;
     int oppLastSeenX = 0;
     int oppLastSeenY = 0;
@@ -29,17 +35,19 @@ public class ChrisJones extends Robot {
                 } 
                 align();
 
-                if(oppLastSeenDistance > 150){
+                if(oppLastSeenDistance > maxShootingDistance){
                     System.out.println(getTime() + "--Driving toward opp ");
                     ahead(oppLastSeenDistance / 3);
                 }else{
-                    double firePower = Rules.MAX_BULLET_POWER - (Rules.MAX_BULLET_POWER / (oppLastSeenDistance - 50));
+                    double firePower = Rules.MAX_BULLET_POWER - (Rules.MAX_BULLET_POWER / (oppLastSeenDistance - minRange));
                     System.out.println(getTime() + "--Shooting! distance: " + oppLastSeenDistance + " power: " + firePower);
                     // Fire a bullet with maximum power if the gun is ready
                     if (getGunHeat() == 0) {
                         fire(firePower);
                     }
-                    else{ahead(10);}
+                    else if(oppLastSeenDistance > minRange){
+                        ahead(Math.max(10, (oppLastSeenDistance - minRange)/2));
+                    }
                 } 
                 System.out.println(getTime() + "Scanning ");
                 turnRadarLeft(45);
