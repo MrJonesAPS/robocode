@@ -18,6 +18,7 @@ public class ChrisJones extends Robot {
     int oppLastSeenY = 0;
     double oppLastSeenBearing = 0;
     double oppLastSeenDistance = 0;
+    double myHeadingLastTimeOppSeen = 0;
     long oppLastSeenTurn = 0;
 
 
@@ -25,15 +26,12 @@ public class ChrisJones extends Robot {
 
         while(true){
             if(foundOpp){
-                //double deltaBearing = oppLastSeenBearing + getHeading();
-                //System.out.println("Turning to face opponent by " + deltaBearing);
-                //System.out.println()
-                if(Math.abs(oppLastSeenBearing) > 10){
-                    System.out.println(getTime() + "--turning " + oppLastSeenBearing);
-                    turnRight(oppLastSeenBearing);
-                    
-                } 
-                align();
+                
+                //set tank's heading to be 30 degrees to the right of target
+                offsetTankFromOpp(30);
+
+                //point gun exactly at target
+                pointGunAndRadar();
 
                 if(oppLastSeenDistance > maxShootingDistance){
                     System.out.println(getTime() + "--Driving toward opp ");
@@ -47,6 +45,10 @@ public class ChrisJones extends Robot {
                     }
                     else if(oppLastSeenDistance > minRange){
                         ahead(Math.max(10, (oppLastSeenDistance - minRange)/2));
+                    }
+                    else{
+                        //I can't do anything else here - gun is too hot and I'm already too close. So just go back a bit and evade
+                        back(50);
                     }
                 } 
                 System.out.println(getTime() + "Scanning ");
@@ -65,10 +67,20 @@ public class ChrisJones extends Robot {
         }
     }
 
-    public void align(){
-        //line up gun with tank
-        if(Math.abs(getGunHeading() - getHeading()) > 5){
-            double degreesToTurn = getGunHeading() - getHeading();
+    public void offsetTankFromOpp(int degrees){
+        if(Math.abs(oppLastSeenBearing + degrees) > 10){
+            System.out.println(getTime() + "--turning " + oppLastSeenBearing + degrees);
+            turnRight(oppLastSeenBearing + degrees);
+        }
+    }
+
+    public void pointGunAndRadar(){
+        double headingThatWouldPointToOpp = myHeadingLastTimeOppSeen + oppLastSeenBearing;
+
+
+        //point gun toward opponent
+        if(Math.abs(getGunHeading() - headingThatWouldPointToOpp) > 5){
+            double degreesToTurn = getGunHeading() - headingThatWouldPointToOpp;
             System.out.println(getTime() + "--Lining up gun with tank. DegreesToTurn before correction: " + degreesToTurn);
             
             if (degreesToTurn < -180){
@@ -85,8 +97,8 @@ public class ChrisJones extends Robot {
         }
         //line up radar 22 degress to right of tank
         //TODO: make this more efficient. Right now i'm wasting ~1 turn by lining up and then going to the right
-        if(Math.abs(getRadarHeading() - getHeading()) > 5){
-            double degreesToTurn = getRadarHeading() - getHeading();
+        if(Math.abs(getRadarHeading() - headingThatWouldPointToOpp) > 5){
+            double degreesToTurn = getRadarHeading() - headingThatWouldPointToOpp;
             System.out.println(getTime() + "--Lining up radar with tank. DegreesToTurn before correction: " + degreesToTurn);
             if (degreesToTurn < -180){
                 System.out.println("Correcting!");
@@ -97,8 +109,8 @@ public class ChrisJones extends Robot {
             }
             System.out.println(getTime() + "--Lining up radar with tank. Turn radar left by " + degreesToTurn);
             
-            turnRadarLeft(degreesToTurn);
-            turnRadarRight(22);
+            turnRadarLeft(degreesToTurn-22);
+            //turnRadarRight(22);
         }
     }
 
@@ -107,11 +119,12 @@ public class ChrisJones extends Robot {
             stop();
         }
         foundOpp = true;
-        double headingAtScan = getHeading();
+        
+        myHeadingLastTimeOppSeen = getHeading();
         oppLastSeenBearing = e.getBearing();
         oppLastSeenDistance = e.getDistance();
         oppLastSeenTurn = e.getTime();
-        System.out.println(e.getTime() + "Scanned enemy! heading " + headingAtScan + " bearing " + oppLastSeenBearing + " distance " + oppLastSeenDistance);
+        System.out.println(e.getTime() + "Scanned enemy! heading " + myHeadingLastTimeOppSeen + " bearing " + oppLastSeenBearing + " distance " + oppLastSeenDistance);
         
     }
 
